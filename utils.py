@@ -138,7 +138,7 @@ def extract_spectra_single(imgLocation, polygons, polygonsOriginal, metadata=0, 
     4) headers: Save the column names/headers of the spectra or wavelengths
     '''
 
-    print( 'Extracting spectra from' + basename(imgLocation))
+    print('Extracting spectra from ' + basename(imgLocation))
     imgFile = rasterio.open(imgLocation, 'r')  # Open raster image
     headers = imgFile.indexes  # column header for wavelength names
     shortName = basename(imgLocation)  # Get file name
@@ -148,7 +148,7 @@ def extract_spectra_single(imgLocation, polygons, polygonsOriginal, metadata=0, 
     # Variables to hold the entire spectral library with metadata
     spectralLibData = np.empty([0, imgFile.count])
     spectralLibName = np.empty([0, 4])
-    if len(metadata)  == 1:
+    if type(metadata) is int:
         spectralLibMeta = ''
     else:
         spectralLibMeta = np.empty([0, metadata.shape[1] + 4])
@@ -179,7 +179,7 @@ def extract_spectra_single(imgLocation, polygons, polygonsOriginal, metadata=0, 
                     spectralLibData = np.vstack((spectralLibData, pixel))
                     spectralLibName = np.vstack((spectralLibName, inName))
                     
-                    if len(metadata) > 1:
+                    if type(metadata) is not int:
                         inMeta = np.hstack((inName, metadata[idx, :]))
                         spectralLibMeta = np.vstack((spectralLibMeta, inMeta))
             
@@ -208,7 +208,7 @@ def extract_spectra_batch(dirLocation, polygons, polygonsOriginal, metadata=0, p
     count = 0
     for singlefile in glob.glob(dirLocation):
         if '.hdr' not in singlefile:
-            print 'Extracting spectra from', os.path.basename(singlefile)
+            print ('Extracting spectra from ' + os.path.basename(singlefile))
             imgFile = rasterio.open(singlefile, 'r')  # Open raster image
             headers = imgFile.indexes  # column header for wavelength names
             shortName = os.path.basename(singlefile)  # Get file name
@@ -291,22 +291,22 @@ def create_spec_lib(polyLocation, imageLocation, outLocation, mode=0, metaLocati
         
         # Load in metadata from .csv
         if isinstance(metaLocation,str):
-            metadata, metaColumnHeader, polyIndex = utils.load_metadata(metaLocation[0], metaLocation[1])
-            spec, name, meta, specColumnHeader = utils.extract_spectra_single(imageLocation, polygons, polygonsOriginal, metadata, polyIndex, metaLocatin[2])
-            utils.write_spectra(outName, specColumnHeader, spec, name)
-            utils.write_metadata(outName, metaColumnHeader, meta)
+            metadata, metaColumnHeader, polyIndex = load_metadata(metaLocation[0], metaLocation[1])
+            spec, name, meta, specColumnHeader,headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal, metadata, polyIndex, metaLocatin[2])
+            write_spectra(outName, specColumnHeader, spec, name)
+            write_metadata(outName, metaColumnHeader, meta)
               
         else:
             # Do not use metadata 
             if metaLocation == 0:
-                spec, name, specColumnHeader = utils.extract_spectra_single(imageLocation, polygons, polygonsOriginal)
-                utils.write_spectra(outName, specColumnHeader, spec, name)            
+                spec, name, specColumnHeader,headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
+                write_spectra(outName, specColumnHeader, spec, name)            
             
             # Load in metadata from shapefile
             else:
-                spec, name, meta, specColumnHeader = utils.extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
-                utils.write_spectra(outName, specColumnHeader, spec, name)
-                utils.write_metadata(outName, polyHeader, meta)
+                spec, name, meta, specColumnHeader, headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
+                write_spectra(outName, specColumnHeader, spec, name)
+                write_metadata(outName, polyHeader, meta)
 
     
     # Extract Spectra from directory
@@ -320,20 +320,20 @@ def create_spec_lib(polyLocation, imageLocation, outLocation, mode=0, metaLocati
                     # Load in metadata from .csv
                     if len(metaLocation) > 1:
                         metadata, metaColumnHeader, polyIndex = load_metadata(metaLocation)
-                        spec, name, meta, specColumnHeader = utils.extract_spectra_single(singlefile, polygons, polygonsOriginal, metadata, polyIndex)
-                        utils.write_spectra(outName, specColumnHeader, spec, name)
-                        utils.write_metadata(outName, metaColumnHeader, meta)
+                        spec, name, meta, specColumnHeader,headers = extract_spectra_single(singlefile, polygons, polygonsOriginal, metadata, polyIndex)
+                        write_spectra(outName, specColumnHeader, spec, name)
+                        write_metadata(outName, metaColumnHeader, meta)
 
                     
                     else:
                         # Do not use metadata 
                         if metaLocation == 0:
-                            spec, name, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
+                            spec, name, specColumnHeader, headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
                             write_spectra(outName, specColumnHeader, spec, name)            
 
                         # Load in metadata from shapefile
                         else:
-                            spec, name, meta, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
+                            spec, name, meta, specColumnHeader, headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
                             write_spectra(outName, specColumnHeader, spec, name)
                             write_metadata(outName, polyHeader, meta)
                         
