@@ -292,19 +292,19 @@ def create_spec_lib(polyLocation, imageLocation, outLocation, mode=0, metaLocati
         # Load in metadata from .csv
         if isinstance(metaLocation,str):
             metadata, metaColumnHeader, polyIndex = load_metadata(metaLocation[0], metaLocation[1])
-            spec, name, meta, specColumnHeader,headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal, metadata, polyIndex, metaLocatin[2])
+            spec, name, meta, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal, metadata, polyIndex, metaLocatin[2])
             write_spectra(outName, specColumnHeader, spec, name)
             write_metadata(outName, metaColumnHeader, meta)
               
         else:
             # Do not use metadata 
             if metaLocation == 0:
-                spec, name, specColumnHeader,headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
+                spec, name, meta, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
                 write_spectra(outName, specColumnHeader, spec, name)            
             
             # Load in metadata from shapefile
             else:
-                spec, name, meta, specColumnHeader, headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
+                spec, name, meta, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
                 write_spectra(outName, specColumnHeader, spec, name)
                 write_metadata(outName, polyHeader, meta)
 
@@ -320,7 +320,7 @@ def create_spec_lib(polyLocation, imageLocation, outLocation, mode=0, metaLocati
                     # Load in metadata from .csv
                     if len(metaLocation) > 1:
                         metadata, metaColumnHeader, polyIndex = load_metadata(metaLocation)
-                        spec, name, meta, specColumnHeader,headers = extract_spectra_single(singlefile, polygons, polygonsOriginal, metadata, polyIndex)
+                        spec, name, meta, specColumnHeader = extract_spectra_single(singlefile, polygons, polygonsOriginal, metadata, polyIndex)
                         write_spectra(outName, specColumnHeader, spec, name)
                         write_metadata(outName, metaColumnHeader, meta)
 
@@ -328,12 +328,12 @@ def create_spec_lib(polyLocation, imageLocation, outLocation, mode=0, metaLocati
                     else:
                         # Do not use metadata 
                         if metaLocation == 0:
-                            spec, name, specColumnHeader, headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
+                            spec, name, meta, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal)
                             write_spectra(outName, specColumnHeader, spec, name)            
 
                         # Load in metadata from shapefile
                         else:
-                            spec, name, meta, specColumnHeader, headers = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
+                            spec, name, meta, specColumnHeader = extract_spectra_single(imageLocation, polygons, polygonsOriginal, polyMeta)
                             write_spectra(outName, specColumnHeader, spec, name)
                             write_metadata(outName, polyHeader, meta)
                         
@@ -350,7 +350,7 @@ def create_spec_lib(polyLocation, imageLocation, outLocation, mode=0, metaLocati
             else:
                 # Do not use metadata 
                 if metaLocation == 0:
-                    spec, name, specColumnHeader = extract_spectra_batch(imageLocation, polygons, polygonsOriginal)
+                    spec, name, meta, specColumnHeader = extract_spectra_batch(imageLocation, polygons, polygonsOriginal)
                     write_spectra(outName, specColumnHeader, spec, name)            
 
                 # Load in metadata from shapefile
